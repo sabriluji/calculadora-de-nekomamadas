@@ -80,6 +80,17 @@ input[type="range"] {
   background: #ffd3e8;
 }
 
+.duration-row {
+  margin-top: 0.35rem;
+}
+
+.duration-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  color: #7a2c56;
+  font-weight: 600;
+}
+
 button {
   width: 100%;
   margin-top: 1rem;
@@ -104,4 +115,15 @@ button:hover {
   background: #ffe0ef;
   border: 1px dashed #ff74b8;
   font-weight: 600;
+}
+
+.time-estimate {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 10px;
+  background: #fce4ec;
+  border: 1px solid #f48fb1;
+  font-weight: 600;
+  color: #6d1b45;
+  line-height: 1.45;
 }

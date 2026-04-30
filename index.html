@@ -34,10 +34,27 @@
           Precio referencia 3DS: <strong id="referencePrice">$0 USD</strong>
         </div>
 
+        <label for="durationPerNeko">Tiempo para conseguir 1 nekomamada</label>
+        <div class="year-control duration-row">
+          <input
+            id="durationPerNeko"
+            type="range"
+            min="1"
+            max="20"
+            step="1"
+            value="10"
+          />
+        </div>
+        <p class="duration-hint" id="durationPerNekoLabel">1 nekomamada cada 10 min</p>
+
         <button id="convertButton" type="button">Convertir</button>
 
         <div class="result" id="result">
           Ingresa un monto para calcular su valor en nekomamadas.
+        </div>
+
+        <div class="time-estimate" id="timeEstimate" aria-live="polite">
+          Ajusta el monto y el ritmo para ver cuánto tardarías en reunir ese dinero.
         </div>
       </section>
     </main>
