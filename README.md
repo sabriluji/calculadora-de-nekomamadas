@@ -4,7 +4,7 @@ Web simple para convertir montos en USD a la unidad monetaria ficticia `nekomama
 
 ## Regla de conversion
 
-- `1 nekomamada = precio de referencia 3DS en USD` del anio elegido (datos `year,price_usd` de 2011 a 2025).
+- `1 nekomamada = precio de referencia 3DS en USD` del anio elegido (datos `year,price_usd` de 2011 a 2026).
 - El monto a convertir debe estar en **USD** para que la division sea coherente con esa referencia.
 
 ## Como usar

@@ -15,6 +15,7 @@ const threeDSPriceUsdByYear = {
   2023: 200,
   2024: 220,
   2025: 240,
+  2026: 260,
 };
 
 const amountInput = document.getElementById("amount");
