@@ -4,7 +4,7 @@ Web simple para convertir montos en MXN a la unidad monetaria ficticia `nekomama
 
 ## Regla de conversion
 
-- `1 nekomamada = precio estimado de una Nintendo Switch en el anio seleccionado`
+- `1 nekomamada = precio estimado de referencia de Nintendo 3DS (New 3DS XL / 2DS XL) en MXN en el anio seleccionado`
 - La interfaz permite cambiar el anio (2017-2026) para calcular "a traves del tiempo".
 
 ## Como usar
