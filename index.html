@@ -8,20 +8,21 @@
   </head>
   <body>
     <main class="container">
-      <section class="card">
+      <div class="app-grid">
+      <section class="card calculator-card">
         <h1>Calculadora de Nekomamadas</h1>
         <p class="subtitle">
-          1 nekomamada equivale al precio de referencia de la 3DS en USD del
-          año seleccionado (tabla year, price_usd).
+          1 nekomamada equivale al precio de referencia de la 3DS en MXN del
+          año seleccionado (tabla year, price_mxn).
         </p>
 
-        <label for="amount">Monto a convertir (USD)</label>
+        <label for="amount">Monto a convertir (MXN)</label>
         <input
           id="amount"
           type="number"
           min="0"
           step="0.01"
-          placeholder="Ej. 99"
+          placeholder="Ej. 1500"
         />
 
         <label for="year">Año de referencia</label>
@@ -31,7 +32,7 @@
         </div>
 
         <div class="reference-price">
-          Precio referencia 3DS: <strong id="referencePrice">$0 USD</strong>
+          Precio referencia 3DS: <strong id="referencePrice">$0 MXN</strong>
         </div>
 
         <label for="durationPerNeko">Tiempo para conseguir 1 nekomamada</label>
@@ -57,6 +58,55 @@
           Ajusta el monto y el ritmo para ver cuánto tardarías en reunir ese dinero.
         </div>
       </section>
+
+      <section class="card history-section" aria-labelledby="historyHeading">
+        <div class="history-header">
+          <h2 id="historyHeading" class="history-title">Nekomamadas en la historia</h2>
+          <button type="button" id="toggleHistoryEditor" class="btn-secondary btn-inline">
+            Abrir sección de editar
+          </button>
+        </div>
+        <p class="history-intro">
+          Aquí verás hechos como noticias económicas y su valor en nekomamadas.
+          Puedes administrarlas desde la sección de editar.
+        </p>
+
+        <div id="historyEditorPanel" class="history-editor is-hidden">
+          <form id="historyForm" class="history-form">
+            <label for="histFact">Titular / hecho</label>
+            <textarea
+              id="histFact"
+              rows="3"
+              required
+              maxlength="2000"
+              placeholder="Ej. Salario mínimo diario en México, 2019…"
+            ></textarea>
+
+            <label for="histAmount">Monto (MXN)</label>
+            <input
+              id="histAmount"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+              placeholder="Ej. 120.5"
+            />
+
+            <label for="histYear">Año de referencia (precio 3DS)</label>
+            <select id="histYear" required></select>
+
+            <div class="history-form-actions">
+              <button type="submit" id="histSubmit">Agregar noticia</button>
+              <button type="button" id="histCancelEdit" class="btn-secondary is-hidden">
+                Cancelar edición
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <ul id="historyList" class="history-list" aria-label="Lista de hechos"></ul>
+      </section>
+      </div>
     </main>
 
     <script src="./script.js"></script>

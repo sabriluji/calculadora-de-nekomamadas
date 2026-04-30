@@ -1,21 +1,21 @@
-// Fuente: serie year,price_usd (3DS referencia).
-const threeDSPriceUsdByYear = {
-  2011: 249,
-  2012: 169,
-  2013: 169,
-  2014: 169,
-  2015: 199,
-  2016: 199,
-  2017: 149,
-  2018: 129,
-  2019: 119,
-  2020: 140,
-  2021: 160,
-  2022: 180,
-  2023: 200,
-  2024: 220,
-  2025: 240,
-  2026: 260,
+// Fuente: serie year,price_mxn (3DS referencia).
+const threeDSPriceMxnByYear = {
+  2011: 4233,
+  2012: 2873,
+  2013: 2873,
+  2014: 2873,
+  2015: 3383,
+  2016: 3383,
+  2017: 2533,
+  2018: 2193,
+  2019: 2023,
+  2020: 2380,
+  2021: 2720,
+  2022: 3060,
+  2023: 3400,
+  2024: 3740,
+  2025: 4080,
+  2026: 4420,
 };
 
 const amountInput = document.getElementById("amount");
@@ -28,14 +28,23 @@ const convertButton = document.getElementById("convertButton");
 const resultElement = document.getElementById("result");
 const timeEstimateElement = document.getElementById("timeEstimate");
 
-const usdFormat = new Intl.NumberFormat("en-US", {
+const mxnFormat = new Intl.NumberFormat("es-MX", {
   style: "currency",
-  currency: "USD",
+  currency: "MXN",
 });
 
-function getReferencePriceUsd() {
-  const year = Number(yearInput.value);
-  return threeDSPriceUsdByYear[year];
+function referenceMxnForYear(yearNum) {
+  return threeDSPriceMxnByYear[yearNum];
+}
+
+function getReferencePriceMxn() {
+  return referenceMxnForYear(Number(yearInput.value));
+}
+
+function nekomamadasForMxn(amountMxn, refYear) {
+  const p = referenceMxnForYear(refYear);
+  if (!p || p <= 0) return NaN;
+  return amountMxn / p;
 }
 
 function getMinutesPerNekomamada() {
@@ -87,9 +96,9 @@ function formatTotalMinutes(totalMin) {
 
 function updateYearUI() {
   const year = yearInput.value;
-  const referencePrice = getReferencePriceUsd();
+  const referencePrice = getReferencePriceMxn();
   yearValue.textContent = year;
-  referencePriceElement.textContent = `${usdFormat.format(referencePrice)} USD`;
+  referencePriceElement.textContent = `${mxnFormat.format(referencePrice)} MXN`;
 }
 
 function updateDurationLabel() {
@@ -102,7 +111,7 @@ function updateConversion() {
   updateDurationLabel();
 
   const amount = Number(amountInput.value);
-  const referencePrice = getReferencePriceUsd();
+  const referencePrice = getReferencePriceMxn();
   const year = yearInput.value;
   const minutesPerNeko = getMinutesPerNekomamada();
 
@@ -114,7 +123,7 @@ function updateConversion() {
   }
 
   const nekomamadas = amount / referencePrice;
-  resultElement.textContent = `${usdFormat.format(amount)} en ${year} equivale a ${nekomamadas.toFixed(
+  resultElement.textContent = `${mxnFormat.format(amount)} en ${year} equivale a ${nekomamadas.toFixed(
     4
   )} nekomamadas.`;
 
@@ -123,7 +132,7 @@ function updateConversion() {
     minutesPerNeko
   )} por nekomamada) tardarías aproximadamente ${formatTotalMinutes(
     totalMinutes
-  )} en conseguir ${usdFormat.format(amount)} (${nekomamadas.toFixed(4)} nekomamadas).`;
+  )} en conseguir ${mxnFormat.format(amount)} (${nekomamadas.toFixed(4)} nekomamadas).`;
 }
 
 yearInput.addEventListener("input", updateConversion);
@@ -137,3 +146,190 @@ amountInput.addEventListener("keydown", (event) => {
 });
 
 updateConversion();
+
+/* —— Nekomamadas en la historia (localStorage) —— */
+const HISTORY_STORAGE = "nekomamadas-history-v1";
+
+const historyForm = document.getElementById("historyForm");
+const histFact = document.getElementById("histFact");
+const histAmount = document.getElementById("histAmount");
+const histYear = document.getElementById("histYear");
+const histSubmit = document.getElementById("histSubmit");
+const histCancelEdit = document.getElementById("histCancelEdit");
+const historyList = document.getElementById("historyList");
+const toggleHistoryEditor = document.getElementById("toggleHistoryEditor");
+const historyEditorPanel = document.getElementById("historyEditorPanel");
+
+let editingHistoryId = null;
+
+function initHistoryYearSelect() {
+  histYear.innerHTML = "";
+  Object.keys(threeDSPriceMxnByYear)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .forEach((y) => {
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = String(y);
+      histYear.appendChild(opt);
+    });
+  histYear.value = "2026";
+}
+
+function loadHistoryItems() {
+  try {
+    const raw = localStorage.getItem(HISTORY_STORAGE);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistoryItems(items) {
+  localStorage.setItem(HISTORY_STORAGE, JSON.stringify(items));
+}
+
+function resetHistoryForm() {
+  editingHistoryId = null;
+  historyForm.reset();
+  histYear.value = "2026";
+  histSubmit.textContent = "Agregar noticia";
+  histCancelEdit.classList.add("is-hidden");
+}
+
+function setEditorOpen(open) {
+  historyEditorPanel.classList.toggle("is-hidden", !open);
+  toggleHistoryEditor.textContent = open
+    ? "Cerrar sección de editar"
+    : "Abrir sección de editar";
+}
+
+function renderHistory() {
+  const items = loadHistoryItems();
+  historyList.innerHTML = "";
+
+  if (items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "history-empty";
+    empty.textContent =
+      "Todavía no hay hechos. Usa el formulario para agregar el primero.";
+    historyList.appendChild(empty);
+    return;
+  }
+
+  const sorted = [...items].sort((a, b) => b.refYear - a.refYear || a.fact.localeCompare(b.fact));
+
+  for (const item of sorted) {
+    const li = document.createElement("li");
+    li.className = "history-item";
+
+    const neko = nekomamadasForMxn(item.amountMxn, item.refYear);
+    const nekoStr = Number.isFinite(neko) ? neko.toFixed(4) : "—";
+    const refP = referenceMxnForYear(item.refYear);
+
+    const pFact = document.createElement("p");
+    pFact.className = "history-item-fact";
+    pFact.textContent = item.fact;
+
+    const pMeta = document.createElement("p");
+    pMeta.className = "history-item-meta";
+    pMeta.textContent = `${mxnFormat.format(item.amountMxn)} · año ref. ${
+      item.refYear
+    } (3DS ${mxnFormat.format(refP)}) → ${nekoStr} nekomamadas`;
+
+    const actions = document.createElement("div");
+    actions.className = "history-item-actions";
+
+    const btnEdit = document.createElement("button");
+    btnEdit.type = "button";
+    btnEdit.className = "btn-secondary btn-inline";
+    btnEdit.textContent = "Editar";
+    btnEdit.addEventListener("click", () => startEditHistory(item));
+
+    const btnDel = document.createElement("button");
+    btnDel.type = "button";
+    btnDel.className = "btn-danger btn-inline";
+    btnDel.textContent = "Eliminar";
+    btnDel.addEventListener("click", () => deleteHistoryItem(item.id));
+
+    actions.append(btnEdit, btnDel);
+    li.append(pFact, pMeta, actions);
+    historyList.appendChild(li);
+  }
+}
+
+function startEditHistory(item) {
+  setEditorOpen(true);
+  editingHistoryId = item.id;
+  histFact.value = item.fact;
+  histAmount.value = String(item.amountMxn);
+  histYear.value = String(item.refYear);
+  histSubmit.textContent = "Guardar cambios";
+  histCancelEdit.classList.remove("is-hidden");
+  histFact.focus();
+}
+
+function deleteHistoryItem(id) {
+  if (!confirm("¿Seguro que quieres eliminar este hecho?")) return;
+  const next = loadHistoryItems().filter((x) => x.id !== id);
+  saveHistoryItems(next);
+  if (editingHistoryId === id) {
+    resetHistoryForm();
+  }
+  renderHistory();
+}
+
+historyForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const fact = histFact.value.trim();
+  const amount = Number(histAmount.value);
+  const refYear = Number(histYear.value);
+
+  if (!fact || !histAmount.value || Number.isNaN(amount) || amount <= 0) {
+    alert("Completa el hecho y un monto en MXN mayor a 0.");
+    return;
+  }
+
+  const items = loadHistoryItems();
+
+  if (editingHistoryId) {
+    const idx = items.findIndex((x) => x.id === editingHistoryId);
+    if (idx === -1) {
+      resetHistoryForm();
+      renderHistory();
+      return;
+    }
+    items[idx] = { ...items[idx], fact, amountMxn: amount, refYear };
+    saveHistoryItems(items);
+    resetHistoryForm();
+    setEditorOpen(false);
+    renderHistory();
+    return;
+  }
+
+  items.push({
+    id: crypto.randomUUID(),
+    fact,
+    amountMxn: amount,
+    refYear,
+  });
+  saveHistoryItems(items);
+  resetHistoryForm();
+  setEditorOpen(false);
+  renderHistory();
+});
+
+histCancelEdit.addEventListener("click", () => {
+  resetHistoryForm();
+  setEditorOpen(false);
+});
+
+toggleHistoryEditor.addEventListener("click", () => {
+  const isOpen = !historyEditorPanel.classList.contains("is-hidden");
+  setEditorOpen(!isOpen);
+});
+
+initHistoryYearSelect();
+setEditorOpen(false);
+renderHistory();
