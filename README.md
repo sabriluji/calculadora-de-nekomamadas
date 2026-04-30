@@ -1,15 +1,15 @@
 # Calculadora de Nekomamadas
 
-Web simple para convertir montos en MXN a la unidad monetaria ficticia `nekomamada`.
+Web simple para convertir montos en USD a la unidad monetaria ficticia `nekomamada`.
 
 ## Regla de conversion
 
-- `1 nekomamada = precio estimado de referencia de Nintendo 3DS (New 3DS XL / 2DS XL) en MXN en el anio seleccionado`
-- La interfaz permite cambiar el anio (2017-2026) para calcular "a traves del tiempo".
+- `1 nekomamada = precio de referencia 3DS en USD` del anio elegido (datos `year,price_usd` de 2011 a 2025).
+- El monto a convertir debe estar en **USD** para que la division sea coherente con esa referencia.
 
 ## Como usar
 
 1. Abre `index.html` en tu navegador.
-2. Escribe un monto en MXN.
+2. Escribe un monto en USD.
 3. Elige el anio con el control deslizante.
 4. Presiona **Convertir**.

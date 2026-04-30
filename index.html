@@ -11,27 +11,27 @@
       <section class="card">
         <h1>Calculadora de Nekomamadas</h1>
         <p class="subtitle">
-          1 nekomamada equivale al precio de referencia de una Nintendo 3DS
-          (New 3DS XL / 2DS XL) en el año seleccionado, en MXN estimados.
+          1 nekomamada equivale al precio de referencia de la 3DS en USD del
+          año seleccionado (tabla year, price_usd).
         </p>
 
-        <label for="amount">Monto a convertir (MXN)</label>
+        <label for="amount">Monto a convertir (USD)</label>
         <input
           id="amount"
           type="number"
           min="0"
           step="0.01"
-          placeholder="Ej. 2500"
+          placeholder="Ej. 99"
         />
 
         <label for="year">Año de referencia</label>
         <div class="year-control">
-          <input id="year" type="range" min="2017" max="2026" step="1" value="2026" />
-          <span id="yearValue">2026</span>
+          <input id="year" type="range" min="2011" max="2025" step="1" value="2025" />
+          <span id="yearValue">2025</span>
         </div>
 
         <div class="reference-price">
-          Precio estimado 3DS: <strong id="referencePrice">$0 MXN</strong>
+          Precio referencia 3DS: <strong id="referencePrice">$0 USD</strong>
         </div>
 
         <button id="convertButton" type="button">Convertir</button>

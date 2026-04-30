@@ -1,16 +1,20 @@
-// Precios de referencia MXN (MSRP / retail típico en México, estimados).
-// Tras el fin de venta oficial (~2020) se congela el último precio típico.
-const threeDSPriceByYear = {
-  2017: 5499,
-  2018: 4999,
-  2019: 4499,
-  2020: 3999,
-  2021: 3999,
-  2022: 3999,
-  2023: 3999,
-  2024: 3999,
-  2025: 3999,
-  2026: 3999,
+// Fuente: serie year,price_usd (3DS referencia).
+const threeDSPriceUsdByYear = {
+  2011: 249,
+  2012: 169,
+  2013: 169,
+  2014: 169,
+  2015: 199,
+  2016: 199,
+  2017: 149,
+  2018: 129,
+  2019: 119,
+  2020: 140,
+  2021: 160,
+  2022: 180,
+  2023: 200,
+  2024: 220,
+  2025: 240,
 };
 
 const amountInput = document.getElementById("amount");
@@ -20,26 +24,26 @@ const referencePriceElement = document.getElementById("referencePrice");
 const convertButton = document.getElementById("convertButton");
 const resultElement = document.getElementById("result");
 
-const mxnFormat = new Intl.NumberFormat("es-MX", {
+const usdFormat = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "MXN",
+  currency: "USD",
 });
 
-function getReferencePrice() {
+function getReferencePriceUsd() {
   const year = Number(yearInput.value);
-  return threeDSPriceByYear[year];
+  return threeDSPriceUsdByYear[year];
 }
 
 function updateYearUI() {
   const year = yearInput.value;
-  const referencePrice = getReferencePrice();
+  const referencePrice = getReferencePriceUsd();
   yearValue.textContent = year;
-  referencePriceElement.textContent = `${mxnFormat.format(referencePrice)} MXN`;
+  referencePriceElement.textContent = `${usdFormat.format(referencePrice)} USD`;
 }
 
 function convertToNekomamadas() {
   const amount = Number(amountInput.value);
-  const referencePrice = getReferencePrice();
+  const referencePrice = getReferencePriceUsd();
   const year = yearInput.value;
 
   if (!amountInput.value || Number.isNaN(amount) || amount <= 0) {
@@ -48,7 +52,7 @@ function convertToNekomamadas() {
   }
 
   const nekomamadas = amount / referencePrice;
-  resultElement.textContent = `${mxnFormat.format(amount)} en ${year} equivale a ${nekomamadas.toFixed(
+  resultElement.textContent = `${usdFormat.format(amount)} en ${year} equivale a ${nekomamadas.toFixed(
     4
   )} nekomamadas.`;
 }
