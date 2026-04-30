@@ -209,6 +209,20 @@ button:hover {
   background: linear-gradient(180deg, #ffe3f0, #ffd5e9);
   border: 1px solid #f48fb1;
   box-shadow: 0 8px 20px rgba(148, 19, 97, 0.12);
+  position: relative;
+}
+
+.history-item::before {
+  content: "NOTICIA";
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: #cf1173;
+  color: #fff;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
 }
 
 .history-item-fact {
@@ -224,11 +238,22 @@ button:hover {
   color: #6d1b45;
 }
 
+.history-item-date {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  color: #8d3a65;
+  font-weight: 600;
+}
+
 .history-item-actions {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.65rem;
   flex-wrap: wrap;
+}
+
+.history-section:not(.edit-mode) .history-item-actions {
+  display: none;
 }
 
 li.history-empty {

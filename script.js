@@ -159,8 +159,10 @@ const histCancelEdit = document.getElementById("histCancelEdit");
 const historyList = document.getElementById("historyList");
 const toggleHistoryEditor = document.getElementById("toggleHistoryEditor");
 const historyEditorPanel = document.getElementById("historyEditorPanel");
+const historySection = document.querySelector(".history-section");
 
 let editingHistoryId = null;
+let isEditMode = false;
 
 function initHistoryYearSelect() {
   histYear.innerHTML = "";
@@ -198,11 +200,11 @@ function resetHistoryForm() {
   histCancelEdit.classList.add("is-hidden");
 }
 
-function setEditorOpen(open) {
+function setEditMode(open) {
+  isEditMode = open;
   historyEditorPanel.classList.toggle("is-hidden", !open);
-  toggleHistoryEditor.textContent = open
-    ? "Cerrar sección de editar"
-    : "Abrir sección de editar";
+  historySection.classList.toggle("edit-mode", open);
+  toggleHistoryEditor.textContent = open ? "Desactivar modo editar" : "Activar modo editar";
 }
 
 function renderHistory() {
@@ -232,6 +234,10 @@ function renderHistory() {
     pFact.className = "history-item-fact";
     pFact.textContent = item.fact;
 
+    const pDate = document.createElement("p");
+    pDate.className = "history-item-date";
+    pDate.textContent = `Año de referencia: ${item.refYear}`;
+
     const pMeta = document.createElement("p");
     pMeta.className = "history-item-meta";
     pMeta.textContent = `${mxnFormat.format(item.amountMxn)} · año ref. ${
@@ -254,13 +260,13 @@ function renderHistory() {
     btnDel.addEventListener("click", () => deleteHistoryItem(item.id));
 
     actions.append(btnEdit, btnDel);
-    li.append(pFact, pMeta, actions);
+    li.append(pFact, pDate, pMeta, actions);
     historyList.appendChild(li);
   }
 }
 
 function startEditHistory(item) {
-  setEditorOpen(true);
+  setEditMode(true);
   editingHistoryId = item.id;
   histFact.value = item.fact;
   histAmount.value = String(item.amountMxn);
@@ -303,7 +309,7 @@ historyForm.addEventListener("submit", (e) => {
     items[idx] = { ...items[idx], fact, amountMxn: amount, refYear };
     saveHistoryItems(items);
     resetHistoryForm();
-    setEditorOpen(false);
+    setEditMode(false);
     renderHistory();
     return;
   }
@@ -316,20 +322,19 @@ historyForm.addEventListener("submit", (e) => {
   });
   saveHistoryItems(items);
   resetHistoryForm();
-  setEditorOpen(false);
+  setEditMode(false);
   renderHistory();
 });
 
 histCancelEdit.addEventListener("click", () => {
   resetHistoryForm();
-  setEditorOpen(false);
+  setEditMode(false);
 });
 
 toggleHistoryEditor.addEventListener("click", () => {
-  const isOpen = !historyEditorPanel.classList.contains("is-hidden");
-  setEditorOpen(!isOpen);
+  setEditMode(!isEditMode);
 });
 
 initHistoryYearSelect();
-setEditorOpen(false);
+setEditMode(false);
 renderHistory();
