@@ -16,7 +16,17 @@
           año seleccionado (tabla year, price_mxn).
         </p>
 
-        <label for="amount">Monto a convertir (MXN)</label>
+        <label for="inputCurrency">Moneda de ingreso</label>
+        <select id="inputCurrency">
+          <option value="MXN">Peso mexicano (MXN)</option>
+          <option value="USD">Dólar estadounidense (USD)</option>
+          <option value="EUR">Euro (EUR)</option>
+          <option value="GBP">Libra esterlina (GBP)</option>
+          <option value="JPY">Yen japonés (JPY)</option>
+          <option value="COP">Peso colombiano (COP)</option>
+        </select>
+
+        <label for="amount">Monto a convertir</label>
         <input
           id="amount"
           type="number"
@@ -34,6 +44,9 @@
         <div class="reference-price">
           Precio referencia 3DS: <strong id="referencePrice">$0 MXN</strong>
         </div>
+        <p class="duration-hint" id="fxInfo">
+          Tipo de cambio: 1 MXN = 1 MXN.
+        </p>
 
         <label for="durationPerNeko">Tiempo para conseguir 1 nekomamada</label>
         <div class="year-control duration-row">

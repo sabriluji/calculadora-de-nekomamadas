@@ -21,17 +21,46 @@ const threeDSPriceMxnByYear = {
 const amountInput = document.getElementById("amount");
 const yearInput = document.getElementById("year");
 const yearValue = document.getElementById("yearValue");
+const inputCurrencySelect = document.getElementById("inputCurrency");
 const referencePriceElement = document.getElementById("referencePrice");
+const fxInfoElement = document.getElementById("fxInfo");
 const durationPerNekoInput = document.getElementById("durationPerNeko");
 const durationPerNekoLabel = document.getElementById("durationPerNekoLabel");
 const convertButton = document.getElementById("convertButton");
 const resultElement = document.getElementById("result");
 const timeEstimateElement = document.getElementById("timeEstimate");
 
-const mxnFormat = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-});
+const currencyConfig = {
+  MXN: { locale: "es-MX", label: "MXN", mxnPerUnit: 1 },
+  USD: { locale: "en-US", label: "USD", mxnPerUnit: 17.0 },
+  EUR: { locale: "de-DE", label: "EUR", mxnPerUnit: 18.6 },
+  GBP: { locale: "en-GB", label: "GBP", mxnPerUnit: 21.8 },
+  JPY: { locale: "ja-JP", label: "JPY", mxnPerUnit: 0.115 },
+  COP: { locale: "es-CO", label: "COP", mxnPerUnit: 0.0042 },
+};
+
+const mxnFormat = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+
+function getSelectedCurrency() {
+  return inputCurrencySelect.value;
+}
+
+function formatMoney(amount, currencyCode) {
+  const cfg = currencyConfig[currencyCode];
+  return new Intl.NumberFormat(cfg.locale, {
+    style: "currency",
+    currency: currencyCode,
+    maximumFractionDigits: currencyCode === "JPY" ? 0 : 2,
+  }).format(amount);
+}
+
+function convertMxnToCurrency(amountMxn, currencyCode) {
+  return amountMxn / currencyConfig[currencyCode].mxnPerUnit;
+}
+
+function convertCurrencyToMxn(amountCurrency, currencyCode) {
+  return amountCurrency * currencyConfig[currencyCode].mxnPerUnit;
+}
 
 function referenceMxnForYear(yearNum) {
   return threeDSPriceMxnByYear[yearNum];
@@ -96,9 +125,17 @@ function formatTotalMinutes(totalMin) {
 
 function updateYearUI() {
   const year = yearInput.value;
-  const referencePrice = getReferencePriceMxn();
+  const referencePriceMxn = getReferencePriceMxn();
+  const currencyCode = getSelectedCurrency();
+  const referenceInCurrency = convertMxnToCurrency(referencePriceMxn, currencyCode);
+  const oneMxnInCurrency = convertMxnToCurrency(1, currencyCode);
   yearValue.textContent = year;
-  referencePriceElement.textContent = `${mxnFormat.format(referencePrice)} MXN`;
+  referencePriceElement.textContent = `${formatMoney(referenceInCurrency, currencyCode)} (${mxnFormat.format(
+    referencePriceMxn
+  )})`;
+  fxInfoElement.textContent = `Tipo de cambio usado: 1 ${currencyCode} = ${mxnFormat.format(
+    currencyConfig[currencyCode].mxnPerUnit
+  )} · 1 MXN = ${formatMoney(oneMxnInCurrency, currencyCode)}.`;
 }
 
 function updateDurationLabel() {
@@ -111,7 +148,9 @@ function updateConversion() {
   updateDurationLabel();
 
   const amount = Number(amountInput.value);
-  const referencePrice = getReferencePriceMxn();
+  const currencyCode = getSelectedCurrency();
+  const referencePriceMxn = getReferencePriceMxn();
+  const referencePriceInCurrency = convertMxnToCurrency(referencePriceMxn, currencyCode);
   const year = yearInput.value;
   const minutesPerNeko = getMinutesPerNekomamada();
 
@@ -122,20 +161,25 @@ function updateConversion() {
     return;
   }
 
-  const nekomamadas = amount / referencePrice;
-  resultElement.textContent = `${mxnFormat.format(amount)} en ${year} equivale a ${nekomamadas.toFixed(
-    4
-  )} nekomamadas.`;
+  const amountMxn = convertCurrencyToMxn(amount, currencyCode);
+  const nekomamadas = amount / referencePriceInCurrency;
+  resultElement.textContent = `${formatMoney(amount, currencyCode)} (${mxnFormat.format(
+    amountMxn
+  )}) en ${year} equivale a ${nekomamadas.toFixed(4)} nekomamadas (1 nekomamada = ${formatMoney(
+    referencePriceInCurrency,
+    currencyCode
+  )}).`;
 
   const totalMinutes = nekomamadas * minutesPerNeko;
   timeEstimateElement.textContent = `A este ritmo (${describeIntervalMinutes(
     minutesPerNeko
   )} por nekomamada) tardarías aproximadamente ${formatTotalMinutes(
     totalMinutes
-  )} en conseguir ${mxnFormat.format(amount)} (${nekomamadas.toFixed(4)} nekomamadas).`;
+  )} en conseguir ${formatMoney(amount, currencyCode)} (${nekomamadas.toFixed(4)} nekomamadas).`;
 }
 
 yearInput.addEventListener("input", updateConversion);
+inputCurrencySelect.addEventListener("input", updateConversion);
 durationPerNekoInput.addEventListener("input", updateConversion);
 amountInput.addEventListener("input", updateConversion);
 convertButton.addEventListener("click", updateConversion);
